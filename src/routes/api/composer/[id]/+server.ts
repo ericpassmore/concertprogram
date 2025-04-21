@@ -1,4 +1,4 @@
-import type { ComposerInterface } from '$lib/server/common';
+import type { ArtistInterface } from '$lib/server/common';
 import {deleteById, queryTable, updateById} from "$lib/server/db";
 import {json} from "@sveltejs/kit";
 import { isAuthorized } from '$lib/server/apiAuth';
@@ -40,7 +40,7 @@ export async function PUT({url, params, request, cookies}) {
 
     const {full_name, years_active, notes} = await request.json();
     const identity: number = Number(params.id)
-    const composer: ComposerInterface = {
+    const composer: ArtistInterface = {
         id: identity,
         full_name: full_name,
         years_active: years_active,

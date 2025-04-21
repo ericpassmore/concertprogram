@@ -54,7 +54,23 @@ export async function PUT({url, cookies, params, request}) {
     }
 }
 
-export async function POST({params, request}) {
+export async function POST({params, request, cookies, url}) {
+    // Check Authorization
+    const pafeAuth = cookies.get('pafe_auth')
+    const origin = request.headers.get('origin'); // The origin of the request (protocol + host + port)
+    const appOrigin = `${url.protocol}//${url.host}`;
+
+    // from local app no checks needed
+    if (origin !== appOrigin ) {
+        if (!request.headers.has('Authorization')) {
+            return json({ result: "error", reason: "Unauthorized" }, { status: 401 })
+        }
+
+        if (pafeAuth != auth_code && !isAuthorized(request.headers.get('Authorization'))) {
+            return json({ result: "error", reason: "Unauthorized" }, { status: 403 })
+        }
+    }
+
     try {
         const {class_name, lottery} = await request.json();
 
@@ -68,9 +84,26 @@ export async function POST({params, request}) {
     }
 }
 
-export async function DELETE({params}) {
+export async function DELETE({params, cookies, url, request}) {
+
+    // Check Authorization
+    const pafeAuth = cookies.get('pafe_auth')
+    const origin = request.headers.get('origin'); // The origin of the request (protocol + host + port)
+    const appOrigin = `${url.protocol}//${url.host}`;
+
+    // from local app no checks needed
+    if (origin !== appOrigin ) {
+        if (!request.headers.has('Authorization')) {
+            return json({ result: "error", reason: "Unauthorized" }, { status: 401 })
+        }
+
+        if (pafeAuth != auth_code && !isAuthorized(request.headers.get('Authorization'))) {
+            return json({ result: "error", reason: "Unauthorized" }, { status: 403 })
+        }
+    }
+
     try {
-        const results = await deleteClassLottery(params.class_name)
+        await deleteClassLottery(params.class_name)
     } catch (error) {
         return json({status: 'error', message: 'Failed to process the request'}, {status: 500});
     }

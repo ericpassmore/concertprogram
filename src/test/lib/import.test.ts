@@ -74,7 +74,7 @@ describe('Test Import Code', () => {
 
         const musicalTitle: ImportMusicalTitleInterface = {
             title: 'J.C.Bach Concerto in C minor 3rd movement',
-            composers: [
+            artists: [
                 { name: 'Johann Christian Bach', yearsActive: 'none'}
             ]
         }
@@ -110,13 +110,13 @@ describe('Test Import Code', () => {
 
         musicalTitles.push( {
             title: 'Random Title 3rd movement',
-            composers: [
+            artists: [
                 { name: 'Johann Christian Bach', yearsActive: 'none'}
             ]
         })
         musicalTitles.push( {
             title: 'Another Title 3rd movement',
-            composers: [
+            artists: [
                 { name: 'NewNewNew', yearsActive: '1970 - 1999'}
             ]
         })
@@ -162,13 +162,13 @@ describe('Test Import Code', () => {
 
         musicalTitles.push( {
             title: 'Random Title 3rd movement',
-            composers: [
+            artists: [
                 { name: 'Johann Christian Bach', yearsActive: 'none'}
             ]
         })
         musicalTitles.push( {
             title: 'Another Title 3rd movement',
-            composers: [
+            artists: [
                 { name: 'NewNewNew', yearsActive: '1970 - 1999'}
             ]
         })
@@ -221,13 +221,13 @@ describe('Test Import Code', () => {
 
         updatedMusicalTitles.push( {
             title: 'Updated Title 3rd Movement',
-            composers: [
+            artists: [
                 { name: 'Johann Christian Bach', yearsActive: 'none'}
             ]
         })
         updatedMusicalTitles.push( {
             title: 'Second Updated Title',
-            composers: [
+            artists: [
                 { name: 'NewNewNew', yearsActive: '1970 - 1999'}
             ]
         })
@@ -285,7 +285,7 @@ describe('Test Import Code', () => {
 
         musicalTitles.push( {
             title: 'Many Composers 3rd movement',
-            composers: [
+            artists: [
                 { name: 'Johann Christian Bach', yearsActive: 'none'},
                 { name: 'Bohuslav Martinu', yearsActive: 'none'},
                 { name: 'Carl Maria von Weber', yearsActive: 'none'}
@@ -293,7 +293,7 @@ describe('Test Import Code', () => {
         })
         musicalTitles.push( {
             title: 'Another Title 3rd movement',
-            composers: [
+            artists: [
                 { name: 'NewNewNew', yearsActive: '1970 - 1999'},
                 { name: 'Edward Elgar', yearsActive: 'None'}
             ]
@@ -347,7 +347,7 @@ describe('Test Import Code', () => {
 
         const musicalTitle: ImportMusicalTitleInterface = {
             title: 'J.C.Bach Concerto in C minor 3rd movement',
-            composers: [
+            artists: [
                 { name: 'Johann Christian Bach', yearsActive: 'none'}
             ]
         }

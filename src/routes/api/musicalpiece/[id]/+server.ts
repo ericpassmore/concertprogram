@@ -42,12 +42,12 @@ export async function PUT({url, params, request, cookies}) {
         const musicalPiece: MusicalPieceInterface = {
             id: params.id,
             printed_name: printed_name,
-            first_composer_id: first_composer_id,
+            first_artist_id: first_composer_id,
             all_movements: all_movements,
-            second_composer_id: second_composer_id,
-            third_composer_id: third_composer_id
+            second_artist_id: second_composer_id,
+            third_artist_id: third_composer_id
         }
-        if (!musicalPiece.printed_name || !musicalPiece.first_composer_id) {
+        if (!musicalPiece.printed_name || !musicalPiece.first_artist_id) {
             return {status: 400, body: {message: 'Missing Field, Try Again'}}
         } else {
             const rowCount = await updateById('musical_piece', musicalPiece)

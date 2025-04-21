@@ -1,4 +1,4 @@
-import type { ComposerInterface } from '$lib/server/common';
+import type { ArtistInterface } from '$lib/server/common';
 import { insertTable } from '$lib/server/db';
 import { json } from '@sveltejs/kit';
 import { isAuthorized } from '$lib/server/apiAuth';
@@ -17,20 +17,21 @@ export async function POST({ request, cookies }) {
 		return json({ result: 'error', reason: 'Unauthorized' }, { status: 403 });
 	}
 
-	const { full_name, years_active, alias } = await request.json();
-	const composer: ComposerInterface = {
+	const { full_name, role, years_active, alias } = await request.json();
+	const artist: ArtistInterface = {
 		id: null,
 		full_name: full_name,
+		role: role,
 		years_active: years_active,
 		notes: alias
 	};
 
-	if (!composer.full_name || !composer.years_active) {
+	if (!artist.full_name || !artist.years_active) {
 		return json({ result: 'error', reason: 'Missing Field' }, { status: 400 });
 	} else {
 		let result: QueryResult;
 		try {
-			result = await insertTable('composer', composer);
+			result = await insertTable('artist', artist);
 		} catch {
 			return json({ result: 'error', reason: 'Failed to process the request' }, { status: 500 });
 		}

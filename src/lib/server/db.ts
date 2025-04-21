@@ -3,7 +3,7 @@ const {Pool} = pkg;
 import {db_user, db_pass, db_name, db_host, db_port, db_ssl} from '$env/static/private';
 import {
     type AccompanistInterface,
-    type ComposerInterface,
+    type ArtistInterface,
     type MusicalPieceInterface,
     type PerformerInterface,
     type PerformanceInterface,
@@ -178,7 +178,7 @@ export async function deleteById(table: string, id: number): Promise<number | nu
     }
 }
 
-export async function insertTable(table: string, data: ComposerInterface | AccompanistInterface | MusicalPieceInterface | PerformerInterface){
+export async function insertTable(table: string, data: ArtistInterface | AccompanistInterface | MusicalPieceInterface | PerformerInterface){
     try {
         const connection = await pool.connect();
 
@@ -187,13 +187,16 @@ export async function insertTable(table: string, data: ComposerInterface | Accom
         const return_id = true;
 
         switch (table) {
-            case 'composer':
-                inputCols = "(full_name, years_active)"
-                inputVals = "('"+(data as ComposerInterface).full_name.replaceAll("'","''").trim()+"', '"+(data as ComposerInterface).years_active+"')"
+            case 'artist':
+                inputCols = "(full_name, role, years_active)"
+                inputVals = "( "
+                  +"'"+(data as ArtistInterface).full_name.replaceAll("'","''").trim()+"', "
+                  +"'"+(data as ArtistInterface).role.replaceAll("'","''").trim()+"', "
+                  +"'"+(data as ArtistInterface).years_active+"')"
                 // add notes
-                if (isNonEmptyString((data as ComposerInterface).notes)) {
+                if (isNonEmptyString((data as ArtistInterface).notes)) {
                     inputCols = inputCols.slice(0, -1) + ", notes)"
-                    inputVals = inputVals.slice(0, -1) +", '"+(data as ComposerInterface).notes.replaceAll("'","''").trim()+"')"
+                    inputVals = inputVals.slice(0, -1) +", '"+(data as ArtistInterface).notes.replaceAll("'","''").trim()+"')"
                 }
                 // return id
                 break;
@@ -224,20 +227,20 @@ export async function insertTable(table: string, data: ComposerInterface | Accom
             case 'musical_piece':
                 inputCols = "(printed_name, first_composer_id)"
                 inputVals = "('"+(data as MusicalPieceInterface).printed_name.replaceAll("'","''").trim()+"', '"+
-                  (data as MusicalPieceInterface).first_composer_id+"')"
+                  (data as MusicalPieceInterface).first_artist_id+"')"
                 // add movements
                 if ((data as MusicalPieceInterface).all_movements != null && ((data as MusicalPieceInterface).all_movements)) {
                     inputCols = inputCols.slice(0, -1) + ", all_movements)"
                     inputVals = inputVals.slice(0, -1) +", '"+(data as MusicalPieceInterface).all_movements.replaceAll("'","''").trim()+"')"
                 }
                 // add another composer
-                if (isNonEmptyString((data as MusicalPieceInterface).second_composer_id)) {
+                if (isNonEmptyString((data as MusicalPieceInterface).second_artist_id)) {
                     inputCols = inputCols.slice(0, -1) + ", second_composer_id)"
-                    inputVals = inputVals.slice(0, -1) +", '"+(data as MusicalPieceInterface).second_composer_id+"')"
+                    inputVals = inputVals.slice(0, -1) +", '"+(data as MusicalPieceInterface).second_artist_id+"')"
                 }
-                if (isNonEmptyString((data as MusicalPieceInterface).third_composer_id)) {
+                if (isNonEmptyString((data as MusicalPieceInterface).third_artist_id)) {
                     inputCols = inputCols.slice(0, -1) + ", third_composer_id)"
-                    inputVals = inputVals.slice(0, -1) +", '"+(data as MusicalPieceInterface).third_composer_id+"')"
+                    inputVals = inputVals.slice(0, -1) +", '"+(data as MusicalPieceInterface).third_artist_id+"')"
                 }
                 //return id
                 break;
@@ -369,7 +372,7 @@ export async function updatePerformance(data: PerformanceInterface,
     }
 }
 
-export async function updateById(table: string, data: ComposerInterface | AccompanistInterface | MusicalPieceInterface | PerformerInterface ){
+export async function updateById(table: string, data: ArtistInterface | AccompanistInterface | MusicalPieceInterface | PerformerInterface ){
     try {
         const connection = await pool.connect();
 
@@ -378,15 +381,15 @@ export async function updateById(table: string, data: ComposerInterface | Accomp
         switch (table) {
             case 'composer':
                 // don't wipe out data
-                if (! (isNonEmptyString((data as ComposerInterface).full_name) &&
-                    isNonEmptyString((data as ComposerInterface).years_active))
+                if (! (isNonEmptyString((data as ArtistInterface).full_name) &&
+                    isNonEmptyString((data as ArtistInterface).years_active))
                 ) {
                     return null
                 }
-                setCols = setCols + " full_name = '"+(data as ComposerInterface).full_name+"'"
-                setCols = setCols + ", years_active = '"+(data as ComposerInterface).years_active+"'"
-                if (isNonEmptyString((data as ComposerInterface).notes)) {
-                    setCols = setCols + ", notes = '" + (data as ComposerInterface).notes + "' "
+                setCols = setCols + " full_name = '"+(data as ArtistInterface).full_name+"'"
+                setCols = setCols + ", years_active = '"+(data as ArtistInterface).years_active+"'"
+                if (isNonEmptyString((data as ArtistInterface).notes)) {
+                    setCols = setCols + ", notes = '" + (data as ArtistInterface).notes + "' "
                 }
                 break;
             case 'accompanist':
@@ -417,20 +420,20 @@ export async function updateById(table: string, data: ComposerInterface | Accomp
             case 'musical_piece':
                 // don't wipe out data
                 if (!isNonEmptyString((data as MusicalPieceInterface).printed_name) &&
-                    !isNonEmptyString((data as MusicalPieceInterface).first_composer_id)
+                    !isNonEmptyString((data as MusicalPieceInterface).first_artist_id)
                 ) {
                     return null
                 }
                 setCols = "printed_name = '"+(data as MusicalPieceInterface).printed_name.replaceAll("'","''").trim()+"'"
-                setCols = setCols + ", first_composer_id = '"+(data as MusicalPieceInterface).first_composer_id+"'"
+                setCols = setCols + ", first_composer_id = '"+(data as MusicalPieceInterface).first_artist_id+"'"
                 if (isNonEmptyString((data as MusicalPieceInterface).all_movements)) {
                     setCols = setCols + ", all_movements = '" + (data as MusicalPieceInterface).all_movements.replaceAll("'","''").trim() + "' "
                 }
-                if (isNonEmptyString((data as MusicalPieceInterface).second_composer_id)) {
-                    setCols = setCols + ", email = '" + (data as MusicalPieceInterface).second_composer_id + "' "
+                if (isNonEmptyString((data as MusicalPieceInterface).second_artist_id)) {
+                    setCols = setCols + ", email = '" + (data as MusicalPieceInterface).second_artist_id + "' "
                 }
-                if (isNonEmptyString((data as MusicalPieceInterface).third_composer_id)) {
-                    setCols = setCols + ", email = '" + (data as MusicalPieceInterface).third_composer_id + "' "
+                if (isNonEmptyString((data as MusicalPieceInterface).third_artist_id)) {
+                    setCols = setCols + ", email = '" + (data as MusicalPieceInterface).third_artist_id + "' "
                 }
                 break;
         }

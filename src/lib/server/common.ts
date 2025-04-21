@@ -4,15 +4,15 @@ export function selectInstrument(input: string): string {
     return toTitleCase(input)
 }
 
-
 export function calcEpochAge(age: number): number {
     const currentYear = new Date().getFullYear();
     return currentYear - age;
 }
 
-export interface ComposerInterface {
+export interface ArtistInterface {
     id: number | null;
     full_name: string;
+    role: string;
     years_active: string;
     notes: string;
 }
@@ -25,10 +25,10 @@ export interface AccompanistInterface {
 export interface MusicalPieceInterface {
     id: number | null;
     printed_name: string;
-    first_composer_id: number;
+    first_artist_id: number;
     all_movements: string | null;
-    second_composer_id: number | null;
-    third_composer_id: number | null;
+    second_artist_id: number | null;
+    third_artist_id: number | null;
 }
 
 export interface PerformerInterface {
@@ -82,14 +82,15 @@ export interface PerformerRankedChoiceInterface {
     fourth_choice_time: Date | null;
 }
 
-export interface ImportComposerInterface {
+export interface ImportArtistInterface {
     name: string;
+    role: string;
     yearsActive: string; // e.g., "1900 - 1980" or "None"
 }
 
 export interface ImportMusicalTitleInterface {
     title: string; // e.g., "Symphony No. 5 in C Minor"
-    composers: ImportComposerInterface[];
+    artists: ImportArtistInterface[];
 }
 
 export interface ImportPerformanceInterface {

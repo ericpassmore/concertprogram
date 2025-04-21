@@ -1,22 +1,22 @@
 import pg from 'pg';
 const { QueryArrayResult } = pg;
 import {queryTable, deleteById, insertTable} from "$lib/server/db";
-import { type ComposerInterface, formatFieldNames } from '$lib/server/common';
+import { type ArtistInterface, formatFieldNames } from '$lib/server/common';
 
 export async function load({ cookies }) {
     const pafeAuth = cookies.get('pafe_auth')
     const isAuthenticated =  !!pafeAuth;
 
-    const res= await queryTable('composer');
+    const res= await queryTable('artist');
     const columnNames: string[] =  res.fields.map(record => formatFieldNames(record.name));
-    return {composers: res.rows, composer_fields: columnNames, isAuthenticated: isAuthenticated};
+    return {artists: res.rows, artists_fields: columnNames, isAuthenticated: isAuthenticated};
 }
 
 export const actions = {
     delete: async ({ request }) => {
         const formData = await request.formData();
-        const id = formData.get('composerId') ? parseInt(formData.get('composerId') as string, 10) : -1;
-        const rowCount = await deleteById('composer', id);
+        const id = formData.get('artistId') ? parseInt(formData.get('artistId') as string, 10) : -1;
+        const rowCount = await deleteById('artist', id);
 
         if (rowCount != null && rowCount > 0) {
             return { status: 200, body: { message: 'Delete successful' } };
@@ -26,17 +26,18 @@ export const actions = {
     },
     add: async ({request}) => {
         const formData = await request.formData();
-        const composer: ComposerInterface = {
+        const artist: ArtistInterface = {
             id: null,
             full_name: formData.get('fullName') as string,
+            role: formData.get('role') as string,
             years_active: formData.get('yearsActive') as string,
             notes: formData.get('notes') as string
         }
 
-        if ( !composer.full_name || !composer.years_active) {
+        if ( !artist.full_name || !artist.years_active) {
             return {status: 400, body: {message: 'Missing Field, Try Again'}}
         } else {
-            const result = await insertTable('composer', composer)
+            const result = await insertTable('artist', artist)
             if (result.rowCount != null && result.rowCount > 0) {
                 return { status: 200, body: { message: 'Insert successful' } };
             } else {

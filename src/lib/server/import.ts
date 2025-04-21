@@ -1,6 +1,6 @@
 import {
 	type AccompanistInterface,
-	type ComposerInterface,
+	type ArtistInterface,
 	type ImportMusicalTitleInterface,
 	type ImportPerformanceInterface,
 	type MusicalPieceInterface,
@@ -44,8 +44,8 @@ interface PerformanceInterfaceTagCreate extends PerformanceInterface {
 export class Performance {
 	public accompanist: AccompanistInterface | null | undefined;
 	public performer: PerformerInterfaceTagCreate | undefined;
-	public composer_1: ComposerInterface[] = [] ;
-	public composer_2: ComposerInterface[] | null = null;
+	public composer_1: ArtistInterface[] = [] ;
+	public composer_2: ArtistInterface[] | null = null;
 	public musical_piece_1: MusicalPieceInterface | undefined;
 	public musical_piece_2: MusicalPieceInterface | null | undefined;
 	public performance: PerformanceInterfaceTagCreate | undefined;
@@ -108,12 +108,13 @@ export class Performance {
 			// process music piece one first
 			const parsedMusic = parseMusicalPiece(data.musical_piece[0].title);
 			// process composers: music piece one
-			for (const composer of data.musical_piece[0].composers) {
-				if (composer?.name != null) {
-					const processed = await this.processComposer({
+			for (const artist of data.musical_piece[0].artists) {
+				if (artist?.name != null) {
+					const processed = await this.processArtist({
 						id: null,
-						full_name: composer.name,
-						years_active: composer.yearsActive,
+						full_name: artist.name,
+						role: artist.role,
+						years_active: artist.yearsActive,
 						notes: 'imported'
 					});
 					this.composer_1.push(processed);
@@ -148,9 +149,9 @@ export class Performance {
 			const parsedMusic = parseMusicalPiece(data.musical_piece[1].title);
 			this.composer_2 = []
 			// process composers: music piece one
-			for (const composer of data.musical_piece[1].composers) {
+			for (const composer of data.musical_piece[1].artists) {
 				if (composer?.name != null) {
-					const processed = await this.processComposer({
+					const processed = await this.processArtist({
 						id: null,
 						full_name: composer.name,
 						years_active: composer.yearsActive,
@@ -187,27 +188,29 @@ export class Performance {
 	}
 	// searches for matching composer by name returning their id
 	// otherwise creates new composer entry
-	private async processComposer(composer_1: ComposerInterface): Promise<ComposerInterface> {
+	private async processArtist(artist: ArtistInterface): Promise<ArtistInterface> {
 		// normalize the string first remove all the Diacritic vowels
-		const res = await searchComposer(composer_1.full_name)
+		const res = await searchComposer(artist.full_name)
 		if (res.rowCount == null || res.rowCount < 1) {
-			const composer: ComposerInterface = {
+			const newArtist: ArtistInterface = {
 				id: null,
-				full_name: composer_1.full_name,
-				years_active: composer_1.years_active,
+				full_name: artist.full_name,
+				role: artist.role,
+				years_active: artist.years_active,
 				notes: 'added via interface'
 			};
-			const result = await insertTable('composer', composer);
+			const result = await insertTable('artist', newArtist);
 			// set the new id
 			if (result.rowCount != null && result.rowCount > 0 && result.rows[0].id > 0) {
-				composer.id = result.rows[0].id;
+				newArtist.id = result.rows[0].id;
 			}
-			return composer;
+			return newArtist;
 		}
 
 		return {
 			id: res.rows[0].id,
 			full_name: res.rows[0].full_name,
+			role: res.rows[0].role,
 			years_active: res.rows[0].years_active,
 			notes: res.rows[0].notes
 		};
@@ -323,7 +326,7 @@ export class Performance {
 	private async processMusicalPiece(
 		printed_title: string,
 		movements: string | null,
-		composers: ComposerInterface[]
+		composers: ArtistInterface[]
 	): Promise<MusicalPieceInterface> {
 		if (composers[0].id === null || composers[0].id === null ) {
 			throw new ComposerError('Primary Composer Can not be null when creating musical pieces')
@@ -337,10 +340,10 @@ export class Performance {
 			const musical_piece: MusicalPieceInterface = {
 				id: null,
 				printed_name: printed_title,
-				first_composer_id: composers[0].id,
+				first_artist_id: composers[0].id,
 				all_movements: movements,
-				second_composer_id: second_composer_id,
-				third_composer_id: third_composer_id
+				second_artist_id: second_composer_id,
+				third_artist_id: third_composer_id
 			};
 			const result = await insertTable('musical_piece', musical_piece);
 			if (result.rowCount != null && result.rowCount > 0 && result.rows[0].id != null) {
@@ -354,10 +357,10 @@ export class Performance {
 		return {
 			id: res.rows[0].id,
 			printed_name: res.rows[0].printed_name,
-			first_composer_id: res.rows[0].first_composer_id,
+			first_artist_id: res.rows[0].first_composer_id,
 			all_movements: res.rows[0].all_movements,
-			second_composer_id: res.rows[0].second_composer_id,
-			third_composer_id: res.rows[0].third_composer_id
+			second_artist_id: res.rows[0].second_composer_id,
+			third_artist_id: res.rows[0].third_composer_id
 		};
 	}
 
@@ -566,13 +569,13 @@ export class DataParser {
 					if (record.piece_1 != null && record.composers_1 != null) {
 						musicalPiecesFromCSV.push({
 							title: record.piece_1,
-							composers: [{ name: record.composers_1, yearsActive: 'None' }]
+							artists: [{ name: record.composers_1, yearsActive: 'None' }]
 						});
 					}
 					if (record.piece_2 != null && record.composers_2 != null) {
 						musicalPiecesFromCSV.push({
 							title: record.piece_2,
-							composers: [{ name: record.composers_2, yearsActive: 'None' }]
+							artists: [{ name: record.composers_2, yearsActive: 'None' }]
 						});
 					}
 					record.musical_piece = musicalPiecesFromCSV;

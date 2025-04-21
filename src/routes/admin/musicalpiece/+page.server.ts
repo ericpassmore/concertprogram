@@ -28,13 +28,13 @@ export const actions = {
         const musicalPiece: MusicalPieceInterface = {
             id: null,
             printed_name: formData.get('printedName'),
-            first_composer_id: formData.get('firstComposerId'),
+            first_artist_id: formData.get('firstComposerId'),
             all_movements: formData.get('allMovements'),
-            second_composer_id: formData.get('secondComposerId'),
-            third_composer_id: formData.get('thirdComposerId')
+            second_artist_id: formData.get('secondComposerId'),
+            third_artist_id: formData.get('thirdComposerId')
         }
 
-        if ( !musicalPiece.printed_name || !musicalPiece.first_composer_id) {
+        if ( !musicalPiece.printed_name || !musicalPiece.first_artist_id) {
             return {status: 400, body: {message: 'Missing Field, Try Again'}}
         } else {
             const result = await insertTable('musical_piece', musicalPiece)
